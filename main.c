@@ -39,6 +39,7 @@ int main(int argc, char* argv[], char* envp[])
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
+            free(buffer);
             return(0);
         }
         remove_newline_at_end(&buffer, &size_read);
@@ -57,6 +58,7 @@ int main(int argc, char* argv[], char* envp[])
         if (pid == -1)
         {
             perror("Error:");
+            free(buffer);
             return (1);
         }
         /*my_pid = getpid();*/
@@ -65,6 +67,7 @@ int main(int argc, char* argv[], char* envp[])
             if (retrncode == -1)
             {
                 perror(argv[0]);
+                free(buffer);
                 exit(retrncode);
             }
             return retrncode;
@@ -73,8 +76,7 @@ int main(int argc, char* argv[], char* envp[])
         {
             wait(&status);
         }
-        buffer = NULL;
-
     }
+    free(buffer);
     return (0);
 }
