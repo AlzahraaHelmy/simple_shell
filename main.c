@@ -17,7 +17,7 @@ int main(int argc, char* argv[], char* envp[])
     pid_t pid;
     size_t buff_size;
     ssize_t size_read;
-    int retrncode, status;
+    int retrncode, status,isinteractive;
     char* buffer, * tokens;
     char* child_argv[] = { "/bin/ls", NULL };
     buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));
@@ -30,7 +30,10 @@ int main(int argc, char* argv[], char* envp[])
         /* todo imp;ement run from args*/
     }
     while (1) {
-        printf("$ ");
+        isinteractive = isatty(fileno(stdin));
+        if (isinteractive) { /*runnig in interactive mode*/
+            printf("#cisfun$ ");
+        }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
             printf("\n");/*exit the program*/
