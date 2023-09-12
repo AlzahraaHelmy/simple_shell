@@ -14,13 +14,12 @@ void remove_newline_at_end(char** buffer, ssize_t* size_read)
 int main(int argc, char* argv[], char* envp[])
 {
     const char delim[2] = " ";
-    int count = 0;
     pid_t pid;
     size_t buff_size;
     ssize_t size_read;
-    int retrncode, status,isinteractive;
+    int retrncode, status,isinteractive,counter;
     char* buffer, * tokens;
-    char* child_argv[] = { "/bin/ls", NULL };
+    char** child_argv;
     buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));
     buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
@@ -32,10 +31,9 @@ int main(int argc, char* argv[], char* envp[])
         /* todo imp;ement run from args*/
     }
     while (1) {
-        count++;
         isinteractive = isatty(fileno(stdin));
         if (isinteractive) { /*runnig in interactive mode*/
-            printf("#cisfun$ ");
+            write(1, prompt, 10);
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
@@ -44,16 +42,20 @@ int main(int argc, char* argv[], char* envp[])
         }
         remove_newline_at_end(&buffer, &size_read);
         tokens = strtok(buffer, delim);
-        child_argv[0] = tokens;
-        /*printf("You entered: '%s'\n", child_argv[0]);*/
-        /*printf("child_argv[0]='%s'\n", child_argv[0]);*/
-        /*printf("argv[0]='%s'\n", argv[0]); */
+        if (tokens == NULL)
+            continue;
+        counter = 0;
+        child_argv = (char**)calloc(MAX_NUM_OF_ARGS , sizeof(char*));
+        while (tokens != NULL)
+        {
+            child_argv[counter] = tokens;
+            tokens = strtok(NULL, delim);
+            counter++;
+        }
         if (strcmp(child_argv[0], argv[0]) == 0 || strcmp(child_argv[0], "") == 0)
         {
-            /*printf("inside if");*/
             continue;
         }
-        
         pid = fork();
         if (pid == -1)
         {
@@ -76,6 +78,7 @@ int main(int argc, char* argv[], char* envp[])
         {
             wait(&status);
         }
+        free(child_argv);
     }
     free(buffer);
     return (0);
