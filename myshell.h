@@ -13,6 +13,8 @@
 #include <errno.h>
 
 #define MAX_INPUT_SIZE 1024
+#define MAX_NUM_OF_ARGS 255
+const char prompt[10]="#cisfun$ ";
 
 
 #endif
