@@ -36,7 +36,6 @@ int main(int argc, char* argv[], char* envp[])
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
-            printf("\n");/*exit the program*/
             exit(0);
         }
         remove_newline_at_end(&buffer, &size_read);
