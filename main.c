@@ -30,7 +30,7 @@ int main(int argc, char* argv[], char* envp[])
         /* todo imp;ement run from args*/
     }
     while (1) {
-        printf("#cisfun$ ");
+        printf("$ ");
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
             printf("\n");/*exit the program*/
