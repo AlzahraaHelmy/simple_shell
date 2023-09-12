@@ -17,11 +17,11 @@ int main(int argc, char* argv[], char* envp[])
     pid_t pid;
     size_t buff_size;
     ssize_t size_read;
-    int retrncode , status;
-    char* buffer , *tokens;
+    int retrncode, status;
+    char* buffer, * tokens;
     char* child_argv[] = { "/bin/ls", NULL };
     buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));
-    buff_size = (size_t) MAX_INPUT_SIZE;
+    buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
     if (argc > 2)
     {
@@ -31,7 +31,7 @@ int main(int argc, char* argv[], char* envp[])
     }
     while (1) {
         printf("#cisfun$ ");
-        size_read = getline(&buffer,&buff_size, stdin);
+        size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
             printf("\n");/*exit the program*/
             exit(0);
@@ -47,7 +47,7 @@ int main(int argc, char* argv[], char* envp[])
             /*printf("inside if");*/
             continue;
         }
-            
+
         pid = fork();
         if (pid == -1)
         {
@@ -67,10 +67,10 @@ int main(int argc, char* argv[], char* envp[])
         else
         {
             wait(&status);
-            
+
         }
-        
-        
+
+
     }
     return (0);
 }
