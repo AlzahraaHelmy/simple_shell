@@ -229,6 +229,7 @@ int main(int argc, char* argv[], char* envp[])
         {
             wait(&status);
         }
+        free(fullpath);
         free(child_argv);
     }
     free(buffer);
