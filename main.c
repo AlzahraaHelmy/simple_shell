@@ -36,7 +36,7 @@ int write_char_in_error(char c)
     return (1);
 }
 /**
- *write_in_error - prints an input
+ * write_in_error - prints an input
  * @str: the str
  * Return: Nothing
  */
@@ -185,7 +185,7 @@ int main(int argc, char* argv[], char* envp[])
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
-            if(sizeof(buffer) == MAX_INPUT_SIZE * sizeof(char))
+            if(sizeof(buffer) != 0)
                 free(buffer);
             return(lasterror);
         }
