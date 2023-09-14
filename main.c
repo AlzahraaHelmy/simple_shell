@@ -1,4 +1,15 @@
 #include"myshell.h"
+void handle_exit(char* c)
+{
+    int len = 0;
+    while (c[len] != '\0')
+        len++;
+    if (len == 4)
+    {
+        if (c[0] == 'e' && c[1] == 'x' && c[2] == 'i' && c[3] == 't')
+            exit(0);
+    }
+}
 /**
  * _eputseschars - writes the character c to stderr
  * @c: The character to print
@@ -191,6 +202,7 @@ int main(int argc, char* argv[], char* envp[])
             perror("PATH not found");
             return(-1);
         }
+        handle_exit(child_argv[0]);
         fullpath = isCommandInPath(child_argv[0], path);
         if (fullpath == NULL)
         {
