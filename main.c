@@ -201,13 +201,13 @@ int main(int argc, char* argv[], char* envp[])
     pid_t pid;
     size_t buff_size;
     ssize_t size_read;
-    int retrncode, status,isinteractive,counter,loopcount = 0,lasterror = 0,isenv = 0;
-    char* buffer, * tokens, *path , *fullpath ;
+    int retrncode, status, isinteractive, counter, loopcount = 0, lasterror = 0, isenv = 0;
+    char* buffer, * tokens, * path, * fullpath;
     char** child_argv;
     buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
     status = 0;
-    buffer = (char*) malloc(MAX_INPUT_SIZE*sizeof(char));
+    buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));
 
     /*setbuf(stdout, NULL);*/
     if (argc > 2)
@@ -225,7 +225,7 @@ int main(int argc, char* argv[], char* envp[])
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
-            if(buffer != fullpath)
+            if (buffer != fullpath)
                 free(buffer);
             return(lasterror);
         }
@@ -234,7 +234,7 @@ int main(int argc, char* argv[], char* envp[])
         if (tokens == NULL)
             continue;
         counter = 0;
-        child_argv = (char**)calloc(MAX_NUM_OF_ARGS , sizeof(char*));
+        child_argv = (char**)calloc(MAX_NUM_OF_ARGS, sizeof(char*));
         while (tokens != NULL)
         {
             child_argv[counter] = tokens;
@@ -245,7 +245,7 @@ int main(int argc, char* argv[], char* envp[])
         {
             continue;
         }
-        handle_exit(child_argv[0],child_argv , lasterror);
+        handle_exit(child_argv[0], child_argv, lasterror);
         isenv = handle_env(child_argv[0], envp);
         if (isenv)
         {
@@ -256,7 +256,12 @@ int main(int argc, char* argv[], char* envp[])
         if (path == 0)
         {
             fullpath = child_argv[0];
-            if (access(fullpath, X_OK) != 0 && (child_argv[0][0] =='/' || child_argv[0][0] == '.')) {
+            if (access(fullpath, X_OK) != 0) {
+                write_error_message(argv[0], loopcount, child_argv[0]);
+                lasterror = errno = 127;
+                continue;
+            }
+            else if (access(fullpath, X_OK) == 0 && (child_argv[0][0] == '/' || child_argv[0][0] == '.')){
                 write_error_message(argv[0], loopcount, child_argv[0]);
                 lasterror = errno = 127;
                 continue;
