@@ -165,7 +165,6 @@ int main(int argc, char* argv[], char* envp[])
     int retrncode, status,isinteractive,counter,loopcount = 0,lasterror = 0;
     char* buffer, * tokens, *path , *fullpath ;
     char** child_argv;
-    /*buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));*/
     buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
     status = 0;
@@ -185,7 +184,7 @@ int main(int argc, char* argv[], char* envp[])
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
-            /*free(buffer); */
+            free(buffer);
             return(lasterror);
         }
         remove_newline_at_end(&buffer, &size_read);
@@ -236,7 +235,6 @@ int main(int argc, char* argv[], char* envp[])
                 return (1);
             }
         }
-        /*my_pid = getpid();*/
         if (pid == 0) {
             retrncode = execve(child_argv[0], child_argv, envp);
             if (retrncode == -1)
@@ -245,7 +243,6 @@ int main(int argc, char* argv[], char* envp[])
                 free(buffer);
                 exit(retrncode);
             }
-            
             return retrncode;
         }
         else if (pid != -2)
