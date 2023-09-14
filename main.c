@@ -237,7 +237,7 @@ int main(int argc, char* argv[], char* envp[])
             {
                 perror(argv[0]);
                 free(buffer);
-                exit(retrncode);
+                exit(0);/*return code*/
             }
             return retrncode;
         }
