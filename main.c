@@ -10,7 +10,7 @@ void handle_exit(char* c, char** child_argv)
         {
             free(c);
             free(child_argv);
-            exit(0);
+            exit(errno);
         }
     }
 }
@@ -165,7 +165,8 @@ int main(int argc, char* argv[], char* envp[])
     buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));
     buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
-    setbuf(stdout, NULL);
+    status = 0;
+    /*setbuf(stdout, NULL);*/
     if (argc > 2)
     {
         printf("%s", envp[0]);
@@ -218,7 +219,7 @@ int main(int argc, char* argv[], char* envp[])
             _eputses(": not found");
             _eputseschars('\n');
             _eputseschars(-1);
-
+            errno = 127;
         }
         else {
             child_argv[0] = fullpath;
@@ -237,13 +238,14 @@ int main(int argc, char* argv[], char* envp[])
             {
                 perror(argv[0]);
                 free(buffer);
-                exit(0);/*return code*/
+                exit(retrncode);
             }
             return retrncode;
         }
         else if (pid != -2)
         {
             wait(&status);
+            errno = status;
         }
         free(fullpath);
         free(child_argv);
