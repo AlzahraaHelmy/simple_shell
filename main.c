@@ -204,14 +204,16 @@ int main(int argc, char* argv[], char* envp[])
         {
             continue;
         }
+        handle_exit(child_argv[0],child_argv , lasterror);
         path = extractPathFromEnv(envp);
         if (path == 0)
         {
-            perror("PATH not found");
-            return(-1);
+            fullpath = child_argv[0];
         }
-        handle_exit(child_argv[0],child_argv , lasterror);
-        fullpath = isCommandInPath(child_argv[0], path);
+        else
+        {
+            fullpath = isCommandInPath(child_argv[0], path);
+        }
         if (fullpath == NULL)
         {
             _eputses(argv[0]);
