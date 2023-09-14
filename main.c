@@ -256,18 +256,12 @@ int main(int argc, char* argv[], char* envp[])
         if (path == 0)
         {
             fullpath = child_argv[0];
-            if (access(fullpath, X_OK) != 0) {
+            if (access(fullpath, X_OK) != 0 || (child_argv[0][0] != '/')) {
                 write_error_message(argv[0], loopcount, child_argv[0]);
                 lasterror = errno = 127;
                 continue;
             }
-            else if (access(fullpath, X_OK) == 0 && (child_argv[0][0] == '/' || child_argv[0][0] == '.')){
-                write_error_message(argv[0], loopcount, child_argv[0]);
-                lasterror = errno = 127;
-                continue;
-            }
-        }
-        else
+        }else
         {
             fullpath = isCommandInPath(child_argv[0], path);
         }
