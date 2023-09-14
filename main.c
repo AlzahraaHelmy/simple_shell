@@ -18,11 +18,11 @@ void handle_exit(char* c, char** child_argv,int lasterror)
     }
 }
 /**
- * _eputseschars - writes the character c to stderr
+ * write_char_in_error - writes the character c to stderr
  * @c: The character to print
  * Return: 1 or -1
  */
-int _eputseschars(char c)
+int write_char_in_error(char c)
 {
     static int i;
     static char buf[1024];
@@ -36,18 +36,18 @@ int _eputseschars(char c)
     return (1);
 }
 /**
- *_eputses - prints an input
+ *write_in_error - prints an input
  * @str: the str
  * Return: Nothing
  */
-void _eputses(char* mystr)
+void write_in_error(char* mystr)
 {
     int i = 0;
     if (!mystr)
         return;
     while (mystr[i] != '\0')
     {
-        _eputseschars(mystr[i]);
+        write_char_in_error(mystr[i]);
         i++;
     }
 }
@@ -186,7 +186,7 @@ int main(int argc, char* argv[], char* envp[])
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
             free(buffer);
-            return(0);
+            return(lasterror);
         }
         remove_newline_at_end(&buffer, &size_read);
         tokens = strtok(buffer, delim);
@@ -216,14 +216,14 @@ int main(int argc, char* argv[], char* envp[])
         }
         if (fullpath == NULL)
         {
-            _eputses(argv[0]);
-            _eputses(": ");
-            _eputses(inttoa(loopcount, 10));
-            _eputses(": ");
-            _eputses(child_argv[0]);
-            _eputses(": not found");
-            _eputseschars('\n');
-            _eputseschars(-1);
+            write_in_error(argv[0]);
+            write_in_error(": ");
+            write_in_error(inttoa(loopcount, 10));
+            write_in_error(": ");
+            write_in_error(child_argv[0]);
+            write_in_error(": not found");
+            write_char_in_error('\n');
+            write_char_in_error(-1);
             lasterror = 127;
         }
         else {
