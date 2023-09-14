@@ -1,4 +1,18 @@
 #include"myshell.h"
+char* inttoa(int val, int base) {
+
+    static char buf[32] = { 0 };
+
+    int i = 30;
+
+    for (; val && i; --i, val /= base)
+
+        buf[i] = "0123456789abcdef"[val % base];
+
+    return &buf[i + 1];
+
+}
+
 void handle_exit(char* c, char** child_argv,int lasterror)
 {
     int len = 0;
@@ -51,18 +65,16 @@ void write_in_error(char* mystr)
         i++;
     }
 }
-char* inttoa(int val, int base) {
-
-    static char buf[32] = { 0 };
-
-    int i = 30;
-
-    for (; val && i; --i, val /= base)
-
-        buf[i] = "0123456789abcdef"[val % base];
-
-    return &buf[i + 1];
-
+void write_error_message(char* argv, int loopcount, char* commd)
+{
+    write_in_error(argv);
+    write_in_error(": ");
+    write_in_error(inttoa(loopcount, 10));
+    write_in_error(": ");
+    write_in_error(commd);
+    write_in_error(": not found");
+    write_char_in_error('\n');
+    write_char_in_error(-1);
 }
 void handleCtrlC(int signum) {
     signum++;
@@ -168,7 +180,7 @@ int main(int argc, char* argv[], char* envp[])
     buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
     status = 0;
-    buffer = (char*)malloc(MAX_INPUT_SIZE);
+    buffer = (char*) malloc(MAX_INPUT_SIZE*sizeof(char));
 
     /*setbuf(stdout, NULL);*/
     if (argc > 2)
@@ -186,7 +198,7 @@ int main(int argc, char* argv[], char* envp[])
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
-            if(buffer != child_argv[0])
+            if(buffer != fullpath)
                 free(buffer);
             return(lasterror);
         }
@@ -211,6 +223,11 @@ int main(int argc, char* argv[], char* envp[])
         if (path == 0)
         {
             fullpath = child_argv[0];
+            if (access(fullpath, X_OK) != 0) {
+                write_error_message(argv[0], loopcount, child_argv[0]);
+                lasterror = errno = 127;
+                continue;
+            }
         }
         else
         {
@@ -218,16 +235,8 @@ int main(int argc, char* argv[], char* envp[])
         }
         if (fullpath == NULL)
         {
-            write_in_error(argv[0]);
-            write_in_error(": ");
-            write_in_error(inttoa(loopcount, 10));
-            write_in_error(": ");
-            write_in_error(child_argv[0]);
-            write_in_error(": not found");
-            write_char_in_error('\n');
-            write_char_in_error(-1);
-            errno = 127;
-            lasterror = 127;
+            write_error_message(argv[0], loopcount, child_argv[0]);
+            lasterror = errno = 127;
         }
         else {
             child_argv[0] = fullpath;
