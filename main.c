@@ -1,4 +1,31 @@
 #include"myshell.h"
+void print_env(char** envp)
+{
+    int len;
+    char** env;
+    for (env = envp; *env != NULL; env++)
+    {
+        len = 0;
+        while ((*env)[len] != '\0')
+            len++;
+        write(1, *env, len);
+        write(1, "\n", 2);
+    }
+}
+int handle_env(char* c, char** envp) {
+    int len = 0;
+    while (c[len] != '\0')
+        len++;
+    if (len == 3)
+    {
+        if (c[0] == 'e' && c[1] == 'n' && c[2] == 'v')
+        {
+            print_env(envp);
+            return 1;
+        }
+    }
+    return 0;
+}
 char* inttoa(int val, int base) {
 
     static char buf[32] = { 0 };
@@ -174,7 +201,7 @@ int main(int argc, char* argv[], char* envp[])
     pid_t pid;
     size_t buff_size;
     ssize_t size_read;
-    int retrncode, status,isinteractive,counter,loopcount = 0,lasterror = 0;
+    int retrncode, status,isinteractive,counter,loopcount = 0,lasterror = 0,isenv = 0;
     char* buffer, * tokens, *path , *fullpath ;
     char** child_argv;
     buff_size = (size_t)MAX_INPUT_SIZE;
@@ -194,7 +221,7 @@ int main(int argc, char* argv[], char* envp[])
         pid = -2;
         isinteractive = isatty(fileno(stdin));
         if (isinteractive) { /*runnig in interactive mode*/
-            write(1, prompt, 10);
+            write(1, prompt, 3);
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
@@ -219,11 +246,17 @@ int main(int argc, char* argv[], char* envp[])
             continue;
         }
         handle_exit(child_argv[0],child_argv , lasterror);
+        isenv = handle_env(child_argv[0], envp);
+        if (isenv)
+        {
+            free(child_argv);
+            continue;
+        }
         path = extractPathFromEnv(envp);
         if (path == 0)
         {
             fullpath = child_argv[0];
-            if (access(fullpath, X_OK) != 0|| child_argv[0][0] !='/' || child_argv[0][0] != '.') {
+            if (access(fullpath, X_OK) != 0 && (child_argv[0][0] =='/' || child_argv[0][0] == '.')) {
                 write_error_message(argv[0], loopcount, child_argv[0]);
                 lasterror = errno = 127;
                 continue;
