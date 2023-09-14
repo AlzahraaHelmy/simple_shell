@@ -169,6 +169,7 @@ int main(int argc, char* argv[], char* envp[])
     signal(SIGINT, handleCtrlC);
     status = 0;
     buffer = (char*)malloc(MAX_INPUT_SIZE);
+
     /*setbuf(stdout, NULL);*/
     if (argc > 2)
     {
@@ -185,7 +186,8 @@ int main(int argc, char* argv[], char* envp[])
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
-            free(buffer);
+            if(buffer != child_argv[0])
+                free(buffer);
             return(lasterror);
         }
         remove_newline_at_end(&buffer, &size_read);
