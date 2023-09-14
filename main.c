@@ -1,4 +1,10 @@
 #include"myshell.h"
+void my_free(void** ptr) {
+    if (ptr != NULL && *ptr != NULL) {
+        free(*ptr);
+        *ptr = NULL;
+    }
+}
 void handle_exit(char* c, char** child_argv,int lasterror)
 {
     int len = 0;
@@ -8,8 +14,8 @@ void handle_exit(char* c, char** child_argv,int lasterror)
     {
         if (c[0] == 'e' && c[1] == 'x' && c[2] == 'i' && c[3] == 't')
         {
-            free(c);
-            free(child_argv);
+            my_free((void **)&c);
+            my_free((void **)&child_argv);
             if (lasterror == 0)
                 exit(lasterror);
             else
@@ -115,7 +121,7 @@ char* isCommandInPath(char* command, const char* path) {
     char* full_path;
     if (command[0] == '/' || command[0] == '.')
     {
-        free(path_clone);
+        my_free((void **)&path_clone);
         full_path = _strdub(command);
         return full_path;
     }
@@ -128,13 +134,13 @@ char* isCommandInPath(char* command, const char* path) {
     while (token != NULL) {
         full_path = make_full_path(token, command);
         if (access(full_path, X_OK) == 0) {
-            free(path_clone);
+            my_free((void **)&path_clone);
             return full_path;
         }
         token = strtok(NULL, ":");
-        free(full_path);
+        my_free((void **)&full_path);
     }
-    free(path_clone);
+    my_free((void **)&path_clone);
     return NULL;
 }
 char* extractPathFromEnv(char* envp[]) {
@@ -185,7 +191,7 @@ int main(int argc, char* argv[], char* envp[])
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
-            free(buffer);
+            my_free((void **)&buffer);
             return(lasterror);
         }
         remove_newline_at_end(&buffer, &size_read);
@@ -232,7 +238,7 @@ int main(int argc, char* argv[], char* envp[])
             if (pid == -1)
             {
                 perror("Error:");
-                free(buffer);
+                my_free((void **)&buffer);
                 return (1);
             }
         }
@@ -242,7 +248,7 @@ int main(int argc, char* argv[], char* envp[])
             if (retrncode == -1)
             {
                 perror(argv[0]);
-                free(buffer);
+                my_free((void **)&buffer);
                 exit(retrncode);
             }
             return retrncode;
@@ -252,9 +258,9 @@ int main(int argc, char* argv[], char* envp[])
             wait(&status);
             lasterror = status;
         }
-        free(fullpath);
-        free(child_argv);
+        my_free((void **)&fullpath);
+        my_free((void **)&child_argv);
     }
-    free(buffer);
+    my_free((void **)&buffer);
     return (0);
 }
