@@ -165,7 +165,7 @@ int main(int argc, char* argv[], char* envp[])
     int retrncode, status,isinteractive,counter,loopcount = 0,lasterror = 0;
     char* buffer, * tokens, *path , *fullpath ;
     char** child_argv;
-    buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));
+    /*buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));*/
     buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
     status = 0;
@@ -185,8 +185,7 @@ int main(int argc, char* argv[], char* envp[])
         }
         size_read = getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
-            if(sizeof(buffer) != 0)
-                free(buffer);
+            /*free(buffer); */
             return(lasterror);
         }
         remove_newline_at_end(&buffer, &size_read);
