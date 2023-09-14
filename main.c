@@ -10,7 +10,10 @@ void handle_exit(char* c, char** child_argv,int lasterror)
         {
             free(c);
             free(child_argv);
-            exit(lasterror);
+            if (lasterror == 0)
+                exit(lasterror);
+            else
+                exit(2);
         }
     }
 }
