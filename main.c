@@ -1,5 +1,5 @@
 #include"myshell.h"
-void handle_exit(char* c, char** child_argv)
+void handle_exit(char* c, char** child_argv,int lasterror)
 {
     int len = 0;
     while (c[len] != '\0')
@@ -10,7 +10,8 @@ void handle_exit(char* c, char** child_argv)
         {
             free(c);
             free(child_argv);
-            exit(errno);
+            printf("%d\n", lasterror);
+            exit(lasterror);
         }
     }
 }
@@ -159,7 +160,7 @@ int main(int argc, char* argv[], char* envp[])
     pid_t pid;
     size_t buff_size;
     ssize_t size_read;
-    int retrncode, status,isinteractive,counter,loopcount = 0;
+    int retrncode, status,isinteractive,counter,loopcount = 0,lasterror = 0;
     char* buffer, * tokens, *path , *fullpath ;
     char** child_argv;
     buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));
@@ -207,7 +208,7 @@ int main(int argc, char* argv[], char* envp[])
             perror("PATH not found");
             return(-1);
         }
-        handle_exit(child_argv[0],child_argv);
+        handle_exit(child_argv[0],child_argv , lasterror);
         fullpath = isCommandInPath(child_argv[0], path);
         if (fullpath == NULL)
         {
@@ -219,7 +220,7 @@ int main(int argc, char* argv[], char* envp[])
             _eputses(": not found");
             _eputseschars('\n');
             _eputseschars(-1);
-            errno = 127;
+            lasterror = 127;
         }
         else {
             child_argv[0] = fullpath;
@@ -245,7 +246,7 @@ int main(int argc, char* argv[], char* envp[])
         else if (pid != -2)
         {
             wait(&status);
-            errno = status;
+            lasterror = status;
         }
         free(fullpath);
         free(child_argv);
