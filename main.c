@@ -223,6 +223,7 @@ int main(int argc, char* argv[], char* envp[])
             write_in_error(": not found");
             write_char_in_error('\n');
             write_char_in_error(-1);
+            errno = 127;
             lasterror = 127;
         }
         else {
