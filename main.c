@@ -168,6 +168,7 @@ int main(int argc, char* argv[], char* envp[])
     buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
     status = 0;
+    buffer = (char*)malloc(MAX_INPUT_SIZE);
     /*setbuf(stdout, NULL);*/
     if (argc > 2)
     {
