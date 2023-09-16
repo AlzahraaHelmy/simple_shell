@@ -305,7 +305,7 @@ int main(int argc, char* argv[], char* envp[])
             return(lasterror);
         }
         remove_newline_at_end(&buffer, &size_read);
-        tokens = strtok(buffer, delim);
+        tokens = my_strtok(buffer, delim);
         if (tokens == NULL)
             continue;
         counter = 0;
@@ -313,7 +313,7 @@ int main(int argc, char* argv[], char* envp[])
         while (tokens != NULL)
         {
             child_argv[counter] = tokens;
-            tokens = strtok(NULL, delim);
+            tokens = my_strtok(NULL, delim);
             counter++;
         }
         if (strcmp(child_argv[0], argv[0]) == 0 || strcmp(child_argv[0], "") == 0)
