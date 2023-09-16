@@ -8,7 +8,7 @@ void print_env(char** envp)
         len = 0;
         while ((*env)[len] != '\0')
             len++;
-        write(1, *env, len + 1);
+        write(1, *env, len+1);
         write(1, "\n", 2);
     }
 }
@@ -27,15 +27,20 @@ int handle_env(char* c, char** envp) {
     return 0;
 }
 char* inttoa(int val, int base) {
+
     static char buf[32] = { 0 };
+
     int i = 30;
+
     for (; val && i; --i, val /= base)
+
         buf[i] = "0123456789abcdef"[val % base];
+
     return &buf[i + 1];
 
 }
 
-void handle_exit(char* c, char** child_argv, int lasterror)
+void handle_exit(char* c, char** child_argv,int lasterror)
 {
     int len = 0;
     while (c[len] != '\0')
@@ -109,7 +114,7 @@ char* _strdub(const char* src)
     n = 0;
     while (src[n] != '\0')
         n++;
-    dest = (char*)calloc(n + 1, sizeof(char));
+    dest = (char*) calloc(n+1, sizeof(char));
     while (src[i] != '\0')
     {
         dest[i] = src[i];
@@ -118,7 +123,7 @@ char* _strdub(const char* src)
     return (dest);
 }
 char* make_full_path(const char* start, const char* end) {
-    int start_length, end_length, i;
+    int start_length, end_length ,i;
     char* result;
     start_length = 0;
     end_length = 0;
@@ -142,7 +147,7 @@ char* make_full_path(const char* start, const char* end) {
     }
     result[start_length + 1 + end_length] = '\0';
     return result;
-}
+} 
 char* isCommandInPath(char* command, const char* path) {
     char* token;
     char* path_clone = _strdub(path);
@@ -196,7 +201,7 @@ int main(int argc, char* argv[], char* envp[])
     pid_t pid;
     size_t buff_size;
     ssize_t size_read;
-    int retrncode, status, isinteractive, counter, loopcount = 0, lasterror = 0, isenv = 0 , free0 = 0;
+    int retrncode, status, isinteractive, counter, loopcount = 0, lasterror = 0, isenv = 0;
     char* buffer, * tokens, * path, * fullpath;
     char** child_argv;
     buff_size = (size_t)MAX_INPUT_SIZE;
@@ -222,16 +227,12 @@ int main(int argc, char* argv[], char* envp[])
         if (size_read == -1) {
             if (buffer != fullpath)
                 free(buffer);
-            if (free0)
-                free(child_argv[0]);
             return(lasterror);
         }
         remove_newline_at_end(&buffer, &size_read);
         tokens = strtok(buffer, delim);
-        if (tokens == NULL) {
-            free0 = 0;
+        if (tokens == NULL)
             continue;
-        }
         counter = 0;
         child_argv = (char**)calloc(MAX_NUM_OF_ARGS, sizeof(char*));
         while (tokens != NULL)
@@ -242,7 +243,6 @@ int main(int argc, char* argv[], char* envp[])
         }
         if (strcmp(child_argv[0], argv[0]) == 0 || strcmp(child_argv[0], "") == 0)
         {
-            free0 = 0;
             continue;
         }
         handle_exit(child_argv[0], child_argv, lasterror);
@@ -250,23 +250,18 @@ int main(int argc, char* argv[], char* envp[])
         if (isenv)
         {
             free(child_argv);
-            free0 = 0;
             continue;
         }
         path = extractPathFromEnv(envp);
         if (path == 0)
         {
-            fullpath = _strdub(child_argv[0]);
+            fullpath = child_argv[0];
             if (access(fullpath, X_OK) != 0 || (child_argv[0][0] != '/')) {
                 write_error_message(argv[0], loopcount, child_argv[0]);
                 lasterror = errno = 127;
-                free0 = 1;
-                free(child_argv);
-                free(fullpath);
                 continue;
             }
-        }
-        else
+        }else
         {
             fullpath = isCommandInPath(child_argv[0], path);
         }
@@ -276,7 +271,7 @@ int main(int argc, char* argv[], char* envp[])
             lasterror = errno = 127;
         }
         else {
-            child_argv[0] = _strdub(fullpath);
+            child_argv[0] = fullpath;
             pid = fork();
             if (pid == -1)
             {
@@ -300,10 +295,8 @@ int main(int argc, char* argv[], char* envp[])
             wait(&status);
             lasterror = status;
         }
-        free(child_argv[0]);
         free(fullpath);
         free(child_argv);
-        free0 = 0;
     }
     free(buffer);
     return (lasterror);
