@@ -407,6 +407,7 @@ int main(int argc, char* argv[], char* envp[])
         isenv = handle_env(child_argv[0], envp);
         if (isenv || isexit)
         {
+            if (isexit) lasterror = 2;
             free(child_argv);
             continue;
         }
