@@ -114,25 +114,61 @@ char* inttoa(int val, int base) {
     return &buf[i + 1];
 
 }
-
-void handle_exit(char* c, char** child_argv, int lasterror)
+/**
+ * _atoi - A string to an int
+ * @s: string to be converted
+ * Return: int converted from the string
+ */
+int _atoi(char* s)
 {
-    int len = 0;
-    while (c[len] != '\0')
+    int i, sign, n, len, f, digit;
+
+    i = sign = n = f = len = digit = 0;
+
+    while (s[len] != '\0')
         len++;
-    if (len == 4)
+
+    while (i < len && f == 0)
     {
-        if (c[0] == 'e' && c[1] == 'x' && c[2] == 'i' && c[3] == 't')
+        if (s[i] == '-')
+            ++sign;
+
+        if (s[i] >= '0' && s[i] <= '9')
         {
-            free(c);
-            free(child_argv);
-            if (lasterror == 0)
-                exit(lasterror);
-            else
-                exit(2);
-        }
+            digit = s[i] - '0';
+            if (sign % 2)
+                digit = -digit;
+            n = n * 10 + digit;
+            f = 1;
+            if (s[i + 1] < '0' || s[i + 1] > '9')
+                break;
+            f = 0;
+        }		i++;
     }
+
+    if (f == 0)
+        return (0);
+
+    return (n);
 }
+/**
+ * is_digit - checking if str contains a non-digit char
+ * @s: string to be checked
+ * Return: 0 or 1
+ */
+int is_digit(char* s)
+{
+    int i = 0;
+
+    while (s[i])
+    {
+        if (s[i] < '0' || s[i] > '9')
+            return (0);
+        i++;
+    }
+    return (1);
+}
+
 /**
  * write_char_in_error - writes the character c to stderr
  * @c: The character to print
@@ -167,6 +203,7 @@ void write_in_error(char* mystr)
         i++;
     }
 }
+
 void write_error_message(char* argv, int loopcount, char* commd)
 {
     write_in_error(argv);
@@ -177,6 +214,52 @@ void write_error_message(char* argv, int loopcount, char* commd)
     write_in_error(": not found");
     write_char_in_error('\n');
     write_char_in_error(-1);
+}
+void write_error_message_exit(char* argv, int loopcount, char* number)
+{
+    write_in_error(argv);
+    write_in_error(": ");
+    write_in_error(inttoa(loopcount, 10));
+    write_in_error(": exit: Illegal number: ");
+    write_in_error(number);
+    write_char_in_error('\n');
+    write_char_in_error(-1);
+}
+int handle_exit(char* c, char** child_argv, int lasterror, char* argv0, int lc)
+{
+    int len = 0;
+    while (c[len] != '\0')
+        len++;
+    if (len == 4)
+    {
+        if (c[0] == 'e' && c[1] == 'x' && c[2] == 'i' && c[3] == 't')
+        {
+            if (!child_argv[1]) {
+                free(c);
+                free(child_argv);
+                if (lasterror == 0)
+                    exit(lasterror);
+                else
+                    exit(2);
+            }
+            else {
+                if (is_digit(child_argv[1]))
+                {
+                    lasterror = _atoi(child_argv[1]);
+                    free(c);
+                    free(child_argv);
+                    exit(lasterror);
+                }
+                else
+                {
+                    write_error_message_exit(argv0, lc, child_argv[1]);
+                    return 1;
+                }
+            }
+
+        }
+    }
+    return 0;
 }
 void handleCtrlC(int signum) {
     signum++;
@@ -276,7 +359,7 @@ int main(int argc, char* argv[], char* envp[])
     pid_t pid;
     size_t buff_size;
     ssize_t size_read;
-    int retrncode, status, isinteractive, counter, loopcount = 0, lasterror = 0, isenv;
+    int retrncode, status, isinteractive, counter, loopcount = 0, lasterror = 0, isenv, isexit;
     char* buffer = 0, * tokens, * path, *fullpath = 0;
     char** child_argv;
     buff_size = (size_t)MAX_INPUT_SIZE;
@@ -320,9 +403,9 @@ int main(int argc, char* argv[], char* envp[])
         {
             continue;
         }
-        handle_exit(child_argv[0], child_argv, lasterror);
+        isexit = handle_exit(child_argv[0], child_argv, lasterror,argv[0],loopcount);
         isenv = handle_env(child_argv[0], envp);
-        if (isenv)
+        if (isenv || isexit)
         {
             free(child_argv);
             continue;
