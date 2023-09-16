@@ -2,6 +2,7 @@
 ssize_t my_getline(char** lineptr, size_t* n, FILE* stream) {
     int c;
     size_t i = 0;
+    char* new_ptr;
     if (*lineptr == NULL) {
         *n = INITIAL_BUFFER_SIZE;
         *lineptr = (char*)malloc(*n);
@@ -12,7 +13,7 @@ ssize_t my_getline(char** lineptr, size_t* n, FILE* stream) {
     while ((c = fgetc(stream)) != EOF && c != '\n') {
         if (i >= *n - 1) {
             *n *= 2;
-            char* new_ptr = (char*)realloc(*lineptr, *n);
+            new_ptr = (char*)realloc(*lineptr, *n);
             if (new_ptr == NULL) {
                 return -1;
             }
