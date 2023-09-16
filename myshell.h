@@ -14,7 +14,8 @@
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_NUM_OF_ARGS 255
-const char prompt[10]="#cisfun$ ";
+#define INITIAL_BUFFER_SIZE 128 /*for getline function*/
+const char prompt[10]="$ ";
 
 
 #endif
