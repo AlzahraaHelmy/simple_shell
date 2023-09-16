@@ -1,4 +1,34 @@
 #include"myshell.h"
+ssize_t my_getline(char** lineptr, size_t* n, FILE* stream) {
+    int c;
+    size_t i = 0;
+    if (*lineptr == NULL) {
+        *n = INITIAL_BUFFER_SIZE;
+        *lineptr = (char*)malloc(*n);
+        if (*lineptr == NULL) {
+            return -1;
+        }
+    }
+    while ((c = fgetc(stream)) != EOF && c != '\n') {
+        if (i >= *n - 1) {
+            *n *= 2;
+            char* new_ptr = (char*)realloc(*lineptr, *n);
+            if (new_ptr == NULL) {
+                return -1;
+            }
+            *lineptr = new_ptr;
+        }
+
+        (*lineptr)[i++] = (char)c;
+    }
+
+    if (i == 0 && c == EOF) {
+        return -1;
+    }
+
+    (*lineptr)[i] = '\0';
+    return i;
+}
 void print_env(char** envp)
 {
     int len;
@@ -202,12 +232,12 @@ int main(int argc, char* argv[], char* envp[])
     size_t buff_size;
     ssize_t size_read;
     int retrncode, status, isinteractive, counter, loopcount = 0, lasterror = 0, isenv;
-    char* buffer, * tokens, * path, *fullpath = 0;
+    char* buffer = 0, * tokens, * path, *fullpath = 0;
     char** child_argv;
     buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
     status = 0;
-    buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));
+    /*buffer = (char*)malloc(MAX_INPUT_SIZE * sizeof(char));*/
 
     /*setbuf(stdout, NULL);*/
     if (argc > 2)
@@ -220,10 +250,10 @@ int main(int argc, char* argv[], char* envp[])
         loopcount++;
         pid = -2;
         isinteractive = isatty(fileno(stdin));
-        if (isinteractive) { /*runnig in interactive mode*/
+        if (isinteractive) {
             write(1, prompt, 3);
         }
-        size_read = getline(&buffer, &buff_size, stdin);
+        size_read = my_getline(&buffer, &buff_size, stdin);
         if (size_read == -1) {
             if (buffer != fullpath)
                 free(buffer);
