@@ -1,4 +1,20 @@
 #include"myshell.h"
+/**
+ * my_strchr - locate a char in string
+ * @str: string
+ * @c: char
+ * Return: 0 if not found and the location if found
+ */
+char* my_strchr(const char* str, int c) {
+    while (*str != '\0') {
+        if (*str == c) {
+            return (char*)str;
+        }
+        str++;
+    }
+
+    return NULL;
+}
 ssize_t my_getline(char** lineptr, size_t* n, FILE* stream) {
     int c;
     size_t i = 0;
@@ -29,6 +45,34 @@ ssize_t my_getline(char** lineptr, size_t* n, FILE* stream) {
 
     (*lineptr)[i] = '\0';
     return i;
+}
+char* my_strtok(char* str, const char* delimiter) {
+    static char* lastToken = NULL;
+    char *tokenStart;
+    if (str != NULL) {
+        lastToken = str;
+    }
+    else {
+        if (lastToken == NULL) {
+            return NULL;
+        }
+    }
+    tokenStart = lastToken;
+    while (*lastToken != '\0' && my_strchr(delimiter, *lastToken) != NULL) {
+        lastToken++;
+    }
+    if (*lastToken == '\0') {
+        lastToken = NULL;
+        return NULL;
+    }
+    while (*lastToken != '\0' && my_strchr(delimiter, *lastToken) == NULL) {
+        lastToken++;
+    }
+    if (*lastToken != '\0') {
+        *lastToken = '\0';
+        lastToken++;
+    }
+    return tokenStart;
 }
 void print_env(char** envp)
 {
