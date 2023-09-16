@@ -8,7 +8,7 @@ void print_env(char** envp)
         len = 0;
         while ((*env)[len] != '\0')
             len++;
-        write(1, *env, len+1);
+        write(1, *env, len + 1);
         write(1, "\n", 2);
     }
 }
@@ -40,7 +40,7 @@ char* inttoa(int val, int base) {
 
 }
 
-void handle_exit(char* c, char** child_argv,int lasterror)
+void handle_exit(char* c, char** child_argv, int lasterror)
 {
     int len = 0;
     while (c[len] != '\0')
@@ -114,7 +114,7 @@ char* _strdub(const char* src)
     n = 0;
     while (src[n] != '\0')
         n++;
-    dest = (char*) calloc(n+1, sizeof(char));
+    dest = (char*)calloc(n + 1, sizeof(char));
     while (src[i] != '\0')
     {
         dest[i] = src[i];
@@ -123,7 +123,7 @@ char* _strdub(const char* src)
     return (dest);
 }
 char* make_full_path(const char* start, const char* end) {
-    int start_length, end_length ,i;
+    int start_length, end_length, i;
     char* result;
     start_length = 0;
     end_length = 0;
@@ -147,7 +147,7 @@ char* make_full_path(const char* start, const char* end) {
     }
     result[start_length + 1 + end_length] = '\0';
     return result;
-} 
+}
 char* isCommandInPath(char* command, const char* path) {
     char* token;
     char* path_clone = _strdub(path);
@@ -201,8 +201,8 @@ int main(int argc, char* argv[], char* envp[])
     pid_t pid;
     size_t buff_size;
     ssize_t size_read;
-    int retrncode, status, isinteractive, counter, loopcount = 0, lasterror = 0, isenv = 0;
-    char* buffer, * tokens, * path, * fullpath;
+    int retrncode, status, isinteractive, counter, loopcount = 0, lasterror = 0, isenv;
+    char* buffer, * tokens, * path, *fullpath = 0;
     char** child_argv;
     buff_size = (size_t)MAX_INPUT_SIZE;
     signal(SIGINT, handleCtrlC);
@@ -261,7 +261,8 @@ int main(int argc, char* argv[], char* envp[])
                 lasterror = errno = 127;
                 continue;
             }
-        }else
+        }
+        else
         {
             fullpath = isCommandInPath(child_argv[0], path);
         }
